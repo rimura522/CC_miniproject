@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pymongo import MongoClient
 
 
-app = Flask(__name__)
+app = Flask(__name__) 
 client = MongoClient('mongodb')
 db = client['ecommerce']
 users_collection = db['users']
