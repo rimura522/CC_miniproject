@@ -5,7 +5,7 @@ import requests
 from pymongo import MongoClient
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from functools import wraps
-
+  
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure secret key
 
