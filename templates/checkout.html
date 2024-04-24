@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> -->
+    <style>
+        body {
+            background-color: #333;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        div {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #555;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input[type="text"], input[type="password"], select {
+            padding: 8px;
+            margin: 5px;
+            width: 90%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="submit"], button{
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        #country, #gender {
+            padding: 8px;
+            margin: 5px;
+            width: 92.7%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="number"], select {
+            padding: 8px;
+            margin: 5px;
+            width: 90%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Checkout</h1>
+        <!-- <div id="product-details">
+            Product details will be dynamically populated here
+        </div> -->
+        <div>
+            <form id="orderForm" onsubmit="return place_order()">
+            <label for="quantity">Quantity:</label>
+            <br>
+            <select id="quantity" name="quantity">
+                <option value="" selected disabled>Select Quantity</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <br>
+            <label for="size">Size:</label>
+            <br>
+            <select id="size" name="size">
+                <option value="" selected disabled>Select Size</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <br>
+            <br>
+            <input type="submit" value="Place Order">
+        </div>
+    </div>
+
+    <script>       
+        function place_order() {
+            alert("O")
+            var size = document.getElementById('size').value;
+            var quantity = document.getElementById('quantity').value;
+            alert("H")
+            // Send POST request to add user
+            var formData = {
+                user_name: user_name,
+                size: size,
+                quantity: quantity,
+                product_name: productType
+            }
+            alert("HI")
+            fetch('/post_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.status === 201) {
+                    alert =("Order Placed.");
+                    window.location.href = "/home";
+                } else if (response.status === 400) {
+                    alert("User name is already taken. Please choose a different one.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+            return false;
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+
+            fetch('/authed_user', {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.status == 201) {
+                    response.json().then(data => {
+                            // Assuming the product name is stored in a field called 'productName'
+                            const user_name = data.user_name;
+                          
+                            // Redirect to home page after successful order placement
+                            // window.location.href = "/home";
+                        }).catch(error => {
+                            console.error('Error parsing JSON:', error);
+                            alert('Error parsing JSON');
+                        });
+                } else {
+                    alert("Not logged in successfully or session expired, redirecting")
+                    // winow.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            // Retrieve product id from URL
+            fetch('/fetch_current_product', {
+                    method: 'GET',
+                })
+                .then(response => {
+                    if (response.status === 201) {
+                        // Assuming the response contains JSON data with product information
+                        response.json().then(data => {
+                            // Assuming the product name is stored in a field called 'productName'
+                            const productType = data.product_name;
+                          
+                            // Redirect to home page after successful order placement
+                            // window.location.href = "/home";
+                        }).catch(error => {
+                            console.error('Error parsing JSON:', error);
+                            alert('Error parsing JSON');
+                        });
+                    } else {
+                        console.error('Failed to fetch order');
+                        alert('Failed to fetch order');
+                        // window.location.href = "/home";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+
+
+
+
+            // // Define product details
+            // let imageSrc, price;
+
+            // if (productType === "product1") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product1.jpg')}}";
+            //     price = "$260.00";
+            // } else if (productType === "product2") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product2.jpg')}}";
+            //     price = "$260.00";
+            // } else if (productType === "product3") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product3.jpg')}}";
+            //     price = "$236.00";
+            // } else if (productType === "product4") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product4.jpg')}}";
+            //     price = "$190.00";
+            // } else if (productType === "product5") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product5.jpg')}}";
+            //     price = "$214.00";
+            // } else if (productType === "product6") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product6.jpg')}}";
+            //     price = "$260.00";
+            // } else if (productType == "product7") {
+            //     imageSrc = "{{ url_for('static', filename='assets/product7.jpg')}}";
+            //     price = "$216.00";
+            // }else{
+            // // } else (productType === "product8") {
+            //     imageSrc = 'assets/product8.jpg';
+            //     price = "$265.00";
+            // // } else {
+            //     // Handle other product types or unknown product types here
+            //     console.log("Unknown product type:", productType);
+            // };
+
+            // var productDetailElement = document.getElementById('product-details');
+            // var imageElement = document.createElement('img');
+            // imageElement.src = imageSrc;
+            // productDetailElement.appendChild(imageElement);
+            // var priceElement = document.createElement('p');
+            // priceElement.textContent = "Price: " + price;
+            // productDetailElement.appendChild(priceElement);
+            
+            
+            });  
+    </script>
+</body>
+</html>

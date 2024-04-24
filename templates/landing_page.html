@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India-Shoes</title>
+    <style>
+        body {
+            background-color: #333;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #555;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input[type="text"], input[type="password"], select {
+            padding: 8px;
+            margin: 5px;
+            width: 90%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="submit"], button{
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        #country, #gender {
+            padding: 8px;
+            margin: 5px;
+            width: 92.7%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="number"], select {
+            padding: 8px;
+            margin: 5px;
+            width: 90%;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    
+</head>
+<body>
+    <div id="container">
+        <h1>Welcome to India-Shoes</h1>
+        <div id="div1">
+            <p>Do you want to sign up or login?</p>
+            <button onclick="showSignUp()">Sign Up</button>
+            <button onclick="showLogin()">Login</button>
+        </div>
+        <div id="div2" class="hidden">
+            <h2>Sign Up</h2>
+            <form id="signupForm" onsubmit="return addUser()">
+                <input type="text" id="username" name="username" placeholder="User Name"><br>
+                <input type="number" id="age" name="age" placeholder="Age"><br>
+                <select id="country" name="country">
+                    <option value="" selected disabled>Select Country</option>
+                    <option value="India">India</option>
+                    <option value="USA">USA</option>
+                    <option value="UK">UK</option>
+                    <option value="Canada">Canada</option>
+                    
+                </select><br>
+                <select id="gender" name="gender">
+                    <option value="" selected disabled>Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select><br>
+                <input type="password" id="password" name="password" placeholder="Password"><br>
+                <input type="submit" value="Sign Up">
+            </form>
+        </div>
+        <div id="div3" class="hidden">
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="return login()">
+                <input type="text" id="loginUsername" name="loginUsername" placeholder="User Name"><br>
+                <input type="password" id="loginPassword" name="loginPassword" placeholder="Password"><br>
+                <input type="submit" value="Login">
+            </form>
+        </div>
+        <div id="response"></div>
+    </div>
+    <script>
+        function showSignUp() {
+            document.getElementById('div1').classList.add('hidden');
+            document.getElementById('div2').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('div1').classList.add('hidden');
+            document.getElementById('div3').classList.remove('hidden');
+        }
+
+        function addUser() {
+            var username = document.getElementById('username').value;
+            var age = document.getElementById('age').value;
+            var country = document.getElementById('country').value;
+            var password = document.getElementById('password').value;
+            var gender = document.getElementById('gender').value;
+
+            // Validation
+            if (!(username && password && age && country && gender)) {
+                alert("Fill in all the fields.");
+                return false;
+            }
+            if (!username.match(/^[a-zA-Z0-9]+$/)) {
+                alert("Username can only contain alphabets and numbers.");
+                return false;
+            }
+            if (isNaN(age) || age < 15 || age > 100) {
+                alert("Age must be a number between 15 and 100.");
+                return false;
+            }
+            if (!password.match(/^[a-zA-Z0-9]+$/)) {
+                alert("Password can only contain alphabets and numbers.");
+                return false;
+            }
+
+            // Send POST request to add user
+            var formData = {
+                user_name: username,
+                age: age,
+                country: country,
+                password: password,
+                gender: gender
+            };
+
+            fetch('/add_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.status === 201) {
+                    fetch('/auth_user', {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                    })
+                    window.location.href = "/home";
+                } else if (response.status === 400) {
+                    alert("User name is already taken. Please choose a different one.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+            return false;
+        }
+
+        function login() {
+            var username = document.getElementById('loginUsername').value;
+            var password = document.getElementById('loginPassword').value;
+
+            // Only proceed if both fields are filled
+            if (!(username && password)) {
+                alert("Fill in all the fields.");
+                return false;
+            }
+            if (!username.match(/^[a-zA-Z0-9]+$/)) {
+                alert("Username can only contain alphabets and numbers.");
+                return false;
+            }
+            if (!password.match(/^[a-zA-Z0-9]+$/)) {
+                alert("Password can only contain alphabets and numbers.");
+                return false;
+            }
+
+            var formData = {user_name: username};
+
+            fetch(`/fetch_user?user_name=${username}&password=${password}`, {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.status === 201) {
+                    fetch('/auth_user', {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                    })
+                window.location.href = "/home";
+                } 
+                else if (response.status === 400) {
+                    alert("Password wrong.");
+                }
+                else{
+                    alert("User not found. Please check your username and password.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+
+            return false;
+            
+        }
+    </script>
+</body>
+</html>

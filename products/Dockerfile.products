@@ -1,0 +1,12 @@
+FROM python:3.8-slim-buster
+
+WORKDIR .
+COPY . .
+
+RUN pip install -r requirements.txt
+
+EXPOSE 5002
+
+COPY products.py .
+
+CMD ["python", "products.py"]

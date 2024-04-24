@@ -1,0 +1,13 @@
+# Dockerfile for the users service
+FROM python:3.8-slim-buster
+
+# Set the working directory
+WORKDIR .
+COPY . .
+RUN pip install -r requirements.txt
+
+# Expose the port
+EXPOSE 5004
+
+# Command to run the application
+CMD ["python", "users.py"]

@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - master
+      # - users
+
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+      - orders
+      - users
+      - products
+
+  orders:
+    build:
+      context: ./orders
+      dockerfile: Dockerfile.orders
+    ports:
+      - "5005:5005"
+
+  products:
+    build:
+      context: ./products
+      dockerfile: Dockerfile.products
+    ports:
+      - "5002:5002"
+
+  users:
+    build:
+      context: ./users  # Adjust the context to point to the "users" subdirectory
+      dockerfile: Dockerfile.users
+    ports:
+      - "5004:5004"  # Expose the users service on port 5004
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
